@@ -38,14 +38,26 @@ app.get('/todos', function(req, res) {
 app.get('/todos/:id', function(req, res) {
   // params returns a string, todo.id is an integer (base 10)
   var todoId = parseInt(req.params.id, 10);
-  // _.findWhere(arrayToSearch, {attribute(s): toFilterBy});
-  var matched = _.findWhere(todos, {id: todoId});
 
-  if (matched) {
-    res.json(matched);
-  } else {
-    res.status(404).send();
-  }
+  db.todo.findById(todoId).then(function(todo) {
+    if (!!todo) { // !! returns truthy/falsey
+      return res.json(todo.toJSON());
+    } else {
+      return res.status(404).send();
+    }
+  }).catch(function(err) {
+    return res.status(500).json(err);
+  })
+
+  // // use localstorage
+  // // _.findWhere(arrayToSearch, {attribute(s): toFilterBy});
+  // var matched = _.findWhere(todos, {id: todoId});
+  //
+  // if (matched) {
+  //   res.json(matched);
+  // } else {
+  //   res.status(404).send();
+  // }
 });
 
 // POST /todos
@@ -62,6 +74,7 @@ app.post('/todos', function(req, res) {
     return res.status(400).json(err);
   })
 
+  //// use localstorage
   //success: res.status(200)return with toJSON
   //fail: res.status(400).json(e);
 
